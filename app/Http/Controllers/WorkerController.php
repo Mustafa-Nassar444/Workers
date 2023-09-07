@@ -1,6 +1,11 @@
 <?php
 namespace App\Http\Controllers;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\WorkerRegisterRequest;
 use App\Models\Worker;
+use App\Services\WorkerService\WorkerAuth\WorkerLoginService;
+use App\Services\WorkerService\WorkerAuth\WorkerRegisterService;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -13,15 +18,20 @@ class WorkerController extends Controller
      * @return void
      */
     public function __construct() {
-        $this->middleware('auth:worker', ['except' => ['login', 'register']]);
+        $this->middleware('auth:worker', ['except' => ['login', 'register','verify']]);
     }
     /**
      * Get a JWT via given credentials.
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login(Request $request){
-        $validator = Validator::make($request->all(), [
+
+
+    public function login(LoginRequest $request){
+
+        return (new WorkerLoginService())->login($request);
+
+      /*  $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
@@ -31,15 +41,16 @@ class WorkerController extends Controller
         if (! $token = auth()->guard('worker')->attempt($validator->validated())) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        return $this->createNewToken($token);
+        return $this->createNewToken($token);*/
     }
     /**
      * Register a User.
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Request $request) {
-        $validator = Validator::make($request->all(), [
+    public function register(WorkerRegisterRequest $request) {
+        return (new WorkerRegisterService())->register($request);
+    /*    $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:clients',
             'password' => 'required|string|min:6',
@@ -57,12 +68,27 @@ class WorkerController extends Controller
                 'photo'=>$request->file('photo')->store('Worker'),
             ]
         ));
+
         return response()->json([
             'message' => 'Worker successfully registered',
             'user' => $worker
-        ], 201);
+        ], 201);*/
     }
 
+    public function verify($token){
+        $worker=Worker::where('Verification',$token)->first();
+        if(!$worker){
+            return response()->json([
+                'message'=>'Invalid verification token!!'
+            ]);
+        }
+        $worker->verification=null;
+        $worker->email_verified_at=now();
+        $worker->save();
+        return response()->json([
+            'message'=>'Your account has been verified successfully.'
+        ]);
+    }
     /**
      * Log the user out (Invalidate the token).
      *

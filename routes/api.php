@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AdminController ,ClientController, WorkerController};
+use App\Http\Controllers\{AdminController, ClientController, VerifyEmailController, WorkerController};
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,7 @@ Route::middleware('DbBackup')->prefix('auth')->group(function (){
             Route::post('/logout',  'logout');
             Route::post('/refresh', 'refresh');
             Route::get('/client-profile', 'clientProfile');
+
         });
     Route::controller(WorkerController::class)->prefix('worker')->group(
         function () {
@@ -42,6 +44,10 @@ Route::middleware('DbBackup')->prefix('auth')->group(function (){
             Route::post('/logout',  'logout');
             Route::post('/refresh', 'refresh');
             Route::get('/worker-profile', 'workerProfile');
+            Route::get('/verify/{token}','verify');
+
         });
+
+
 });
 
