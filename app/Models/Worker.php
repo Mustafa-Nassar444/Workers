@@ -56,4 +56,9 @@ class Worker extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function getJWTCustomClaims() {
         return [];
     }
+
+
+    public function posts(){
+        return $this->hasMany(Post::class,'worker_id');
+    }
 }

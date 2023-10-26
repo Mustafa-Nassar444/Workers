@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AdminController, ClientController, VerifyEmailController, WorkerController};
+use App\Http\Controllers\{AdminController, ClientController, WorkerController};
 
 /*
 |--------------------------------------------------------------------------
@@ -50,4 +50,22 @@ Route::middleware('DbBackup')->prefix('auth')->group(function (){
 
 
 });
+Route::controller(\App\Http\Controllers\PostController::class)->prefix('worker/post')->group(function (){
+   Route::post('/add','store')->middleware('auth:worker');
+   Route::get('/approved','approvedPosts')->middleware('auth:admin');
+   Route::post('/{post}','show')->middleware('auth:worker');
+});
 
+Route::prefix('admin/')->group(function (){
+    Route::post('post/change_status',[\App\Http\Controllers\AdminDashboard\PostStatusController::class,'changePostStatus'])->middleware('auth:admin');
+
+});
+
+Route::controller(\App\Http\Controllers\AdminDashboard\AdminNotificationController::class)->prefix('notifications')->group(function (){
+    Route::get('/all','index');
+    Route::get('/unreadNotifications','unreadNotification');
+    Route::post('/markAllAsRead','markAllAsRead');
+    Route::post('/markAsRead/{id}','markAsRead');
+    Route::delete('/delete','delete');
+
+})->middleware('auth:admin');
