@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AdminController, ClientController, WorkerController};
+use App\Http\Controllers\{AdminController, ClientController, WorkerController, WorkerReviewController};
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +19,7 @@ use App\Http\Controllers\{AdminController, ClientController, WorkerController};
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });*/
-Route::middleware('DbBackup')->prefix('auth')->group(function (){
+Route::prefix('auth')->group(function (){
     Route::controller(AdminController::class)->prefix('admin')->group(
         function () {
             Route::post('/login','login');
@@ -56,6 +56,12 @@ Route::controller(\App\Http\Controllers\PostController::class)->prefix('worker/p
    Route::post('/{post}','show')->middleware('auth:worker');
 });
 
+Route::prefix('worker/')->group(function (){
+    Route::get('pending/orders',[\App\Http\Controllers\ClientOrderController::class,'workerOrder'])->middleware('auth:worker');
+    Route::put('update/{clientOrder}',[\App\Http\Controllers\ClientOrderController::class,'update'])->middleware('auth:worker');
+    Route::post('review/store',[WorkerReviewController::class,'store'])->middleware('auth:client');
+    Route::get('review/post/{id}', [WorkerReviewController::class, 'showReview'])->middleware('auth:worker');
+});
 Route::prefix('admin/')->group(function (){
     Route::post('post/change_status',[\App\Http\Controllers\AdminDashboard\PostStatusController::class,'changePostStatus'])->middleware('auth:admin');
 
@@ -69,3 +75,13 @@ Route::controller(\App\Http\Controllers\AdminDashboard\AdminNotificationControll
     Route::delete('/delete','delete');
 
 })->middleware('auth:admin');
+
+Route::prefix('client')->group(function (){
+
+    Route::controller(\App\Http\Controllers\ClientOrderController::class)->prefix('/order')->group(function (){
+        Route::post('/store','store')->middleware('auth:client');
+
+    });
+
+
+});

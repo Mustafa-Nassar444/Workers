@@ -195,10 +195,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        \App\Providers\ClientOrderServiceProvider::class,
 
-        Yousefpackage\LaraBackup\Providers\LaraBackupServiceProvider::class,
-        Yousefpackage\LaraBackup\Providers\BackupServiceProvider::class,
-        Yousefpackage\LaraBackup\Providers\RouteServiceProvider::class,
+
 
     ],
 
