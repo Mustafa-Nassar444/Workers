@@ -1,14 +1,11 @@
 <?php
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Worker;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\WorkerRegisterRequest;
 use App\Models\Worker;
 use App\Services\WorkerService\WorkerAuth\WorkerLoginService;
 use App\Services\WorkerService\WorkerAuth\WorkerRegisterService;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class WorkerController extends Controller
 {
@@ -111,9 +108,7 @@ class WorkerController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function workerProfile() {
-        return response()->json(auth()->guard('worker')->user());
-    }
+
     /**
      * Get the token array structure.
      *

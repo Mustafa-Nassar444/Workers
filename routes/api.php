@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\Request;
+use App\Http\Controllers\{AdminController, ClientController, Worker\WorkerController, Worker\ReviewController};
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AdminController, ClientController, WorkerController, WorkerReviewController};
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +41,6 @@ Route::prefix('auth')->group(function (){
             Route::post('/register',  'register');
             Route::post('/logout',  'logout');
             Route::post('/refresh', 'refresh');
-            Route::get('/worker-profile', 'workerProfile');
             Route::get('/verify/{token}','verify');
 
         });
@@ -59,8 +56,12 @@ Route::controller(\App\Http\Controllers\PostController::class)->prefix('worker/p
 Route::prefix('worker/')->group(function (){
     Route::get('pending/orders',[\App\Http\Controllers\ClientOrderController::class,'workerOrder'])->middleware('auth:worker');
     Route::put('update/{clientOrder}',[\App\Http\Controllers\ClientOrderController::class,'update'])->middleware('auth:worker');
-    Route::post('review/store',[WorkerReviewController::class,'store'])->middleware('auth:client');
-    Route::get('review/post/{id}', [WorkerReviewController::class, 'showReview'])->middleware('auth:worker');
+    Route::post('review/store',[ReviewController::class,'store'])->middleware('auth:client');
+    Route::get('review/post/{id}', [ReviewController::class, 'showReview'])->middleware('auth:worker');
+    Route::get('profile/', [\App\Http\Controllers\Worker\ProfileController::class,'workerProfile'])->middleware('auth:worker');
+    Route::post('profile/', [\App\Http\Controllers\Worker\ProfileController::class,'update'])->middleware('auth:worker');
+
+
 });
 Route::prefix('admin/')->group(function (){
     Route::post('post/change_status',[\App\Http\Controllers\AdminDashboard\PostStatusController::class,'changePostStatus'])->middleware('auth:admin');

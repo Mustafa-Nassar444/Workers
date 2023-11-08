@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Worker;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\WorkerReviewRequest;
 use App\Http\Resources\WorkerReviewResource;
 use App\Models\WorkerReview;
-use Illuminate\Http\Request;
 
-class WorkerReviewController extends Controller
+class ReviewController extends Controller
 {
     public function store(WorkerReviewRequest $request){
         $data=$request->all();
