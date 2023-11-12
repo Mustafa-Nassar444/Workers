@@ -1,6 +1,14 @@
 <?php
 
-use App\Http\Controllers\{AdminController, ClientController, Worker\WorkerController, Worker\ReviewController};
+use App\Http\Controllers\{AdminController,
+    AdminDashboard\AdminNotificationController,
+    AdminDashboard\PostStatusController,
+    ClientController,
+    ClientOrderController,
+    PostController,
+    Worker\ProfileController,
+    Worker\WorkerController,
+    Worker\ReviewController};
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,9 +22,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-/*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});*/
+
 Route::prefix('auth')->group(function (){
     Route::controller(AdminController::class)->prefix('admin')->group(
         function () {
@@ -34,6 +40,7 @@ Route::prefix('auth')->group(function (){
             Route::post('/refresh', 'refresh');
             Route::get('/client-profile', 'clientProfile');
 
+
         });
     Route::controller(WorkerController::class)->prefix('worker')->group(
         function () {
@@ -47,28 +54,36 @@ Route::prefix('auth')->group(function (){
 
 
 });
-Route::controller(\App\Http\Controllers\PostController::class)->prefix('worker/post')->group(function (){
+Route::controller(PostController::class)->prefix('worker/post')->group(function (){
    Route::post('/add','store')->middleware('auth:worker');
    Route::get('/approved','approvedPosts')->middleware('auth:admin');
    Route::post('/{post}','show')->middleware('auth:worker');
 });
 
 Route::prefix('worker/')->group(function (){
-    Route::get('pending/orders',[\App\Http\Controllers\ClientOrderController::class,'workerOrder'])->middleware('auth:worker');
-    Route::put('update/{clientOrder}',[\App\Http\Controllers\ClientOrderController::class,'update'])->middleware('auth:worker');
-    Route::post('review/store',[ReviewController::class,'store'])->middleware('auth:client');
-    Route::get('review/post/{id}', [ReviewController::class, 'showReview'])->middleware('auth:worker');
-    Route::get('profile/', [\App\Http\Controllers\Worker\ProfileController::class,'workerProfile'])->middleware('auth:worker');
-    Route::post('profile/', [\App\Http\Controllers\Worker\ProfileController::class,'update'])->middleware('auth:worker');
+
+    Route::controller(ClientOrderController::class)->group(function (){
+        Route::get('pending/orders','workerOrder');
+        Route::put('update/{clientOrder}','update');
+    });
+
+    Route::get('review/post/{id}', [ReviewController::class, 'showReview']);
+
+    Route::controller(ProfileController::class)->group(function (){
+        Route::get('profile/', 'workerProfile');
+        Route::post('profile/', 'update');
+        Route::delete('posts/delete','delete');
+    });
 
 
-});
+})->middleware('auth:worker');
+
 Route::prefix('admin/')->group(function (){
-    Route::post('post/change_status',[\App\Http\Controllers\AdminDashboard\PostStatusController::class,'changePostStatus'])->middleware('auth:admin');
+    Route::post('post/change_status',[PostStatusController::class,'changePostStatus'])->middleware('auth:admin');
 
 });
 
-Route::controller(\App\Http\Controllers\AdminDashboard\AdminNotificationController::class)->prefix('notifications')->group(function (){
+Route::controller(AdminNotificationController::class)->prefix('notifications')->group(function (){
     Route::get('/all','index');
     Route::get('/unreadNotifications','unreadNotification');
     Route::post('/markAllAsRead','markAllAsRead');
@@ -79,10 +94,11 @@ Route::controller(\App\Http\Controllers\AdminDashboard\AdminNotificationControll
 
 Route::prefix('client')->group(function (){
 
-    Route::controller(\App\Http\Controllers\ClientOrderController::class)->prefix('/order')->group(function (){
-        Route::post('/store','store')->middleware('auth:client');
+    Route::controller(ClientOrderController::class)->prefix('/order')->group(function (){
+        Route::post('/store','store');
 
     });
 
-
-});
+    Route::post('review/store',[ReviewController::class,'store']);
+    Route::get('/pay/{id}',[\App\Http\Controllers\PaymentController::class,'pay']);
+})->middleware('auth:client');

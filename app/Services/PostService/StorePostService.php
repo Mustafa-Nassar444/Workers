@@ -18,14 +18,14 @@ class StorePostService
         $this->model=new Post();
     }
 
-    public function adminPercent($price){
-        $discount=$price*0.05;
+    /*public function adminPercent($price){
+        $discount=$price/5;
         $clientPrice=$price-$discount;
         return $clientPrice;
-    }
+    }*/
     public function storePost($request){
         $data=$request->except('photos');
-        $data['price']=$this->adminPercent($data['price']);
+       // $data['price']=$this->model->adminPercent($data['price']);
         $data['worker_id']=auth()->guard('worker')->id();
         $post=Post::create($data);
         return $post;
@@ -57,7 +57,7 @@ class StorePostService
             DB::commit();
             return response()->json([
                 'message'=>'Post added successfully',
-                'Profit'=>'Client profit is '.$post->price,
+                'Profit'=>'Client profit is '.$this->model->adminPercent($post->price),
             ]);
         }
         catch (\Exception $e){

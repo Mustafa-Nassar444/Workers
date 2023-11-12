@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Worker;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WorkerUpdateRequest;
+use App\Models\Post;
 use App\Models\Worker;
 use App\Models\WorkerReview;
 use App\Services\WorkerService\WorkerUpdateService;
@@ -34,5 +35,12 @@ class ProfileController extends Controller
 
         return (new WorkerUpdateService())->update($request);
 
+    }
+
+    public function delete(){
+        $posts=Post::where('worker_id',auth()->guard('worker')->id())->delete();
+        return response()->json([
+            'message'=>'Posts cleaned'
+        ]);
     }
 }
