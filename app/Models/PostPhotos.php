@@ -9,4 +9,8 @@ class PostPhotos extends Model
 {
     use HasFactory;
     protected $fillable=['post_id','photo'];
+
+    public function post(){
+        return $this->belongsTo(Post::class);
+    }
 }

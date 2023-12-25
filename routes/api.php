@@ -57,7 +57,7 @@ Route::prefix('auth')->group(function (){
 Route::controller(PostController::class)->prefix('worker/post')->group(function (){
    Route::post('/add','store')->middleware('auth:worker');
    Route::get('/approved','approvedPosts')->middleware('auth:admin');
-   Route::post('/{post}','show')->middleware('auth:worker');
+   Route::post('/{id}','show')->middleware('auth:worker');
 });
 
 Route::prefix('worker/')->group(function (){

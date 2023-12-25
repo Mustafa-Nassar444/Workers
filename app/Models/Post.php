@@ -24,4 +24,8 @@ class Post extends Model
         $clientPrice=$price-$discount;
         return $clientPrice;
     }
+
+    public function photos(){
+        return $this->hasMany(PostPhotos::class,'post_id')->select('id','photo');
+    }
 }

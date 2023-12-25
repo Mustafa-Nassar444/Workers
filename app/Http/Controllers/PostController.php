@@ -8,6 +8,8 @@ use App\Services\PostService\StorePostService;
 use App\Traits\FilterTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -30,7 +32,11 @@ class PostController extends Controller
             return response()->json(['posts'=>'Empty Posts']);
     }
 
-    public function show(Post $post){
-        return response()->json(['Post'=>$post]);
+    public function show($id){
+        $post=Post::with('photos')->find($id);
+        dd(DB::getQueryLog());
+        /* $post->load('photos');
+         Log::debug('Loaded Photos: ' . json_encode($post->photos));*/
+        return response()->json(['Post' => array_merge($post->toArray(), ['photos' => $post->photos->toArray()])]);
     }
 }
